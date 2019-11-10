@@ -14,7 +14,6 @@ function initDiagram() {
     $(go.Diagram,
       {
         'undoManager.isEnabled': true,  // enable undo & redo
-        'clickCreatingTool.archetypeNodeData': { text: 'new node', color: 'lightblue' },
         model: $(go.GraphLinksModel,
           {
             linkKeyProperty: 'key'  // IMPORTANT! must be defined for merges and data sync when using GraphLinksModel
@@ -59,9 +58,7 @@ function App() {
           { key: -4, from: 2, to: 3 },
           { key: -5, from: 3, to: 0 }
         ]}
-        // onModelChange={handleModelChange}
       />
-      ...
       </div>
   );
 }

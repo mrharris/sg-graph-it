@@ -1,3 +1,40 @@
+## SG Graph It 
+This is a react front end and flask back end.
+
+To set up the front-end
+ - `npm install` (install the stuff in package.json)
+ - `npm build` (compile the `src` and `public` data into a `build` folder)  
+
+To set up the back-end
+```bash
+cd server
+# set up a virtual env
+python3 -m venv venv
+
+# activate it
+./venv/Scripts/activate (windows)
+./venv/bin/activate (linux)
+
+# install the requirements
+pip install -r requirements.txt
+```
+Create a server/.env file with the following contents
+```bash
+.env.local
+FLASK_APP=app.webapp  
+FLASK_ENV=development  
+SG_URL="https://site.shotgunstudio.com"  
+SG_SCRIPT_NAME="script_name"  
+SG_SCRIPT_KEY="script_key"  
+```
+Run the back end `python -m flask run`. It should load the built html from the front-end
+
+Unlike default flask apps, this one expects to find the front end scripts in the
+`build` folder rather than `/static` and `/templates` since we are using react
+rather than jinja and that is where react builds to. 
+
+--
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
