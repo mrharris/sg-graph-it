@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 def to_uid(entity):
     return hash((entity["id"], entity["type"]))
 
@@ -8,6 +11,7 @@ def conform(entity, nodes, links):
         "key": key,
         "name": entity.get("name", entity.get("code", entity.get("title", entity.get("content", "UNKNOWN")))),
         "type": entity["type"],
+        "image": entity.get("image", None),
         "fields": [],
     }
 
@@ -24,7 +28,7 @@ def conform(entity, nodes, links):
     # process the entity fields
     for field, value in entity.items():
         # skip fields we already have
-        if field in ("name", "type"):
+        if field in ("name", "type", "image"):
             continue
         # convert entities into just their "name" value
         elif isinstance(value, list):
@@ -35,9 +39,17 @@ def conform(entity, nodes, links):
         elif "." in field:
             sfn, en, dfn = field.split(".")
             target_entity = entity[sfn]
+            if target_entity is None:
+                # linked field does not link to anything
+                continue
             target_node = nodes[to_uid(target_entity)]
             target_node["fields"].append({"field": dfn, "value": value})
             continue
+        elif isinstance(value, datetime):
+            value = str(value)
+        if isinstance(value, str):
+            # truncate the string
+            value = value[:80] + (value[80:] and '..')
         node.setdefault("fields", []).append({"field": field, "value": value})
 
     nodes.setdefault(key, {}).update(node)
