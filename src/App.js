@@ -21,7 +21,10 @@ function initDiagram() {
                 "undoManager.isEnabled": true,
                 "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,
                 "initialAutoScale": go.Diagram.Uniform,
-                "layout": $(go.LayeredDigraphLayout)
+                "layout": $(go.LayeredDigraphLayout, {
+                                direction: 270,
+                                layerSpacing: 35
+                            }),
             });
 
 

@@ -2,7 +2,23 @@ from datetime import datetime
 
 
 def to_uid(entity):
-    return hash((entity["id"], entity["type"]))
+    return "{}:{}".format(entity["type"], entity["id"])
+
+
+def from_uid(uid):
+    _type, _id = uid.split(":")
+    return {"type": _type, "id": int(_id)}
+
+
+def ensure_thumbnails(nodes, sg):
+    by_entity_type = {}
+    for uid, node in nodes.items():
+        if not node["image"]:
+            entity = from_uid(uid)
+            by_entity_type.setdefault(entity["type"], []).append(entity["id"])
+    for entity_type, ids in by_entity_type.items():
+        for entity in sg.find(entity_type, [["id", "in", ids]], ["image"]):
+            nodes[to_uid(entity)]["image"] = entity.get("image")
 
 
 def conform(entity, nodes, links):

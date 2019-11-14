@@ -1,5 +1,6 @@
 import os
 import json
+from pprint import pprint
 
 from flask import request, render_template, jsonify, url_for
 import shotgun_api3
@@ -8,7 +9,6 @@ from . import app
 from . import util
 
 # TODO
-#  thumbnail on linked entities
 #  groups (nodeGroupKeyProperty)
 #  node sizes to expand to text
 #  colored based on entity type
@@ -26,8 +26,6 @@ sg = shotgun_api3.Shotgun(
 @app.route('/', methods=["POST"])
 def hello_world():
     post_dict = request.form.to_dict()
-    from pprint import pprint
-    pprint(post_dict)
     entity_type = post_dict["entity_type"]
     entity_ids = post_dict["selected_ids"] or post_dict["ids"]
     entity_ids = [int(id_) for id_ in entity_ids.split(",")]
@@ -43,13 +41,20 @@ def hello_world():
     # then also query for the entity itself (HumanUser) so that we can make a node
     fields.extend([f.split(".")[0] for f in fields if "." in f])
 
-    project = {"type": "Project", "id": int(post_dict["project_id"])}
-    entities = sg.find(entity_type, [["id", "in", entity_ids], ["project", "is", project]], fields)
+    filters = [["id", "in", entity_ids]]
+
+    if "project_id" in post_dict:
+        project = {"type": "Project", "id": int(post_dict["project_id"])}
+        filters.append(["project", "is", project])
+
+    entities = sg.find(entity_type, filters, fields)
 
     nodes = {}
     links = []
     for entity in entities:
         util.conform(entity, nodes, links)
+
+    util.ensure_thumbnails(nodes, sg)
 
     # TODO the nested grouping needs to be respected
     data = {
@@ -58,12 +63,6 @@ def hello_world():
     }
 
     return render_template("index.html", data=json.dumps(data))
-
-
-@app.route('/')
-def index():
-    # print(url_for("index.html"))
-    return render_template("index.html")
 
 
 if __name__ == '__main__':

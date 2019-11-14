@@ -3,7 +3,7 @@ This is a react front end and flask back end.
 
 To set up the front-end
  - `npm install` (install the stuff in package.json)
- - `npm build` (compile the `src` and `public` data into a `build` folder)  
+ - `npm run build` (compile the `src` and `public` data into a `build` folder)  
 
 To set up the back-end
 ```bash
@@ -13,7 +13,7 @@ python3 -m venv venv
 
 # activate it
 ./venv/Scripts/activate (windows)
-./venv/bin/activate (linux)
+source ./venv/bin/activate (linux)
 
 # install the requirements
 pip install -r requirements.txt
