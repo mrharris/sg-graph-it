@@ -6,8 +6,18 @@ def to_uid(entity):
 
 
 def from_uid(uid):
-    _type, _id = uid.split(":")
-    return {"type": _type, "id": int(_id)}
+    try:
+        _type, _id = uid.split(":")
+        return {"type": _type, "id": int(_id)}
+    except ValueError:
+        return None
+
+
+def get_field_value(node, field_name):
+    for field in node["fields"]:
+        name, value = field["field"], field["value"]
+        if field_name == name:
+            return value
 
 
 def ensure_thumbnails(nodes, sg):
@@ -19,6 +29,23 @@ def ensure_thumbnails(nodes, sg):
     for entity_type, ids in by_entity_type.items():
         for entity in sg.find(entity_type, [["id", "in", ids]], ["image"]):
             nodes[to_uid(entity)]["image"] = entity.get("image")
+
+
+def apply_grouping(nodes, entity_type, group_field):
+    # only supports one level of grouping. implementing multiple levels is not
+    # trivial because it either means a node must belong to multiple groups
+    # (not supported by gojs) OR it means repeating a node it it appears in
+    # multiple groups
+    groups = {}
+    for uid, node in nodes.items():
+        if node["type"] != entity_type:
+            # we only want to group nodes of this type
+            continue
+        group_value = get_field_value(node, group_field)
+        node["group"] = group_value
+        if group_value not in groups:
+            groups[group_value] = {"key": group_value, "text": group_value, "isGroup": True}
+    return list(groups.values())
 
 
 def conform(entity, nodes, links):

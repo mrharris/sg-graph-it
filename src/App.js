@@ -116,6 +116,25 @@ function initDiagram() {
             $(go.Shape, {toArrow: "Standard"})
         );
 
+    myDiagram.groupTemplate =
+    $(go.Group, "Auto",
+      // { layout: $(go.TreeLayout) },
+      $(go.Shape, "Rectangle", { fill: "rgba(255,180,0,0.35)", stroke: "darkorange" }),
+      $(go.Panel, "Table",
+        { margin: 0.5 },  // avoid overlapping border with table contents
+        $(go.RowColumnDefinition, { row: 0, background: "white" }),  // header is white
+        $("SubGraphExpanderButton", { row: 0, column: 0, margin: 3 }),
+        $(go.TextBlock,  // title is centered in header
+          { row: 0, column: 1, font: "bold 14px Sans-Serif", stroke: "darkorange",
+            textAlign: "center", stretch: go.GraphObject.Horizontal },
+          new go.Binding("text")),
+        $(go.Placeholder,  // becomes zero-sized when Group.isSubGraphExpanded is false
+          { row: 1, columnSpan: 2, padding: 50, alignment: go.Spot.TopLeft },
+          new go.Binding("padding", "isSubGraphExpanded",
+                         function(exp) { return exp ? 10 : 0; } ).ofObject())
+      )
+    );
+
     return myDiagram;
 }
 

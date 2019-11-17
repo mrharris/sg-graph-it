@@ -9,7 +9,8 @@ from . import app
 from . import util
 
 # TODO
-#  groups (nodeGroupKeyProperty)
+#  linked entities should also group
+#  link src come from field icon
 #  node sizes to expand to text
 #  colored based on entity type
 #  double click goes to sg page
@@ -26,13 +27,14 @@ sg = shotgun_api3.Shotgun(
 @app.route('/', methods=["POST"])
 def hello_world():
     post_dict = request.form.to_dict()
+    pprint(post_dict)
     entity_type = post_dict["entity_type"]
     entity_ids = post_dict["selected_ids"] or post_dict["ids"]
     entity_ids = [int(id_) for id_ in entity_ids.split(",")]
     fields = post_dict["cols"].split(",")
-    group_fields = post_dict.get("grouping_columns", post_dict.get("grouping_column", "")).split(",")
-    if group_fields != [""]:
-        fields.extend(group_fields)
+    group_field = post_dict.get("grouping_column")
+    if group_field:
+        fields.append(group_field)
 
     # add the standard fields we want to get
     fields.extend(["image"])
@@ -51,15 +53,17 @@ def hello_world():
 
     nodes = {}
     links = []
+
     for entity in entities:
         util.conform(entity, nodes, links)
 
     util.ensure_thumbnails(nodes, sg)
 
-    # TODO the nested grouping needs to be respected
+    groups = util.apply_grouping(nodes, entity_type, group_field)
+
     data = {
-        "nodes": list(nodes.values()),
-        "links": links
+        "nodes": list(nodes.values()) + groups,
+        "links": links,
     }
 
     return render_template("index.html", data=json.dumps(data))
