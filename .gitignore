@@ -23,5 +23,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-server/venv
+venv
 .idea
+
+/app/static/gojs/release/
