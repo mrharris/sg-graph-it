@@ -23,24 +23,9 @@ function initDiagram() {
   let fieldTemplate = $(
     go.Panel,
     "TableRow", // this Panel is a row in the containing Table
-    new go.Binding("portId", "field"), // this Panel is a "port"
     {
-      fromSpot: go.Spot.Right, // links only go from the right side to the left side
-      toSpot: go.Spot.Left,
       maxSize: new go.Size(125, 12)
     },
-    $(
-      go.Shape, // icon
-      {
-        width: 12,
-        height: 12,
-        column: 0,
-        strokeWidth: 2,
-        margin: 4,
-        fill: "#FFB900",
-        figure: "Diamond"
-      }
-    ),
     $(
       go.TextBlock, // field
       {
@@ -60,7 +45,19 @@ function initDiagram() {
         alignment: go.Spot.Left
       },
       new go.Binding("text", "value")
-    )
+    ),
+      $(
+      go.Shape, "Diamond",// icon
+        new go.Binding("portId", "field"), // this Panel is a "port"
+      {
+        width: 12,
+        height: 12,
+        column: 3,
+        strokeWidth: 2,
+        margin: 4,
+        fill: "#d79800",
+      }
+    ),
   );
 
   // This template represents a whole "record".
@@ -141,7 +138,7 @@ function initDiagram() {
   myDiagram.groupTemplate = $(
     go.Group,
     "Auto",
-    // { layout: $(go.TreeLayout) },
+     // { layout: $(go.LayeredDigraphLayout) },
     $(go.Shape, "Rectangle", {
       fill: "rgba(255,180,0,0.35)",
       stroke: "darkorange"
