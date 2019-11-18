@@ -9,9 +9,6 @@ from . import app
 from . import util
 
 # TODO
-#  linked entities should also group
-#  link src come from field icon
-#  node sizes to expand to text
 #  colored based on entity type
 #  double click goes to sg page
 #  node search
@@ -57,7 +54,12 @@ def hello_world():
     for entity in entities:
         util.conform(entity, nodes, links)
 
-    util.ensure_thumbnails(nodes, sg)
+    by_entity_type = util.get_additional_fields(nodes, ["image"])
+    util.dict_merge(
+        by_entity_type,
+        util.get_additional_fields(nodes, fields, [entity_type])
+    )
+    util.query_additional_fields(nodes, by_entity_type, sg)
 
     groups = util.apply_grouping(nodes, entity_type, group_field)
 
@@ -71,12 +73,3 @@ def hello_world():
 
 if __name__ == '__main__':
     app.run()
-
-
-"""
-    schema = sg.schema_field_read(entity_type, project_entity=project)
-    query_fields = []
-    for field_name, field_data in schema.items():
-        if field_name in fields and field_data["data_type"]["value"] in ["multi_entity", "entity"]:
-            query_fields.append(field_name)
-"""
