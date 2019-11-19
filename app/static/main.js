@@ -138,7 +138,12 @@ function initDiagram() {
     myDiagram.groupTemplate = $(
         go.Group,
         "Auto",
-        // { layout: $(go.LayeredDigraphLayout) },
+        {
+            layout: $(go.LayeredDigraphLayout, {
+                direction: 270,
+                layerSpacing: 35
+            })
+        },
         $(go.Shape, "Rectangle", {
             fill: "rgba(255,180,0,0.35)",
             stroke: "darkorange"
@@ -182,13 +187,13 @@ $(document).ready(function () {
 
         if (this.value === "Horizontal") {
             diagram.layout = $(go.LayeredDigraphLayout, {direction: 270});
-        } else if(this.value === "Vertical") {
+        } else if (this.value === "Vertical") {
             diagram.layout = $(go.LayeredDigraphLayout, {direction: 0});
-        } else if(this.value === "Circular") {
+        } else if (this.value === "Circular") {
             diagram.layout = $(go.CircularLayout);
-        }else if(this.value === "Grid") {
+        } else if (this.value === "Grid") {
             diagram.layout = $(go.GridLayout);
-        }else if(this.value === "Force Directed") {
+        } else if (this.value === "Force Directed") {
             diagram.layout = $(go.ForceDirectedLayout);
         }
     });
