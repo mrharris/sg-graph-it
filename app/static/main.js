@@ -66,7 +66,11 @@ function initDiagram() {
         "Auto",
         {deletable: false},
         // this rectangular shape surrounds the content of the node
-        $(go.Shape, {fill: "#c4c4c4"}),
+        $(go.Shape,
+            new go.Binding("fill", "isHighlighted", function (h) {
+                return h ? "#e4bd6a" : "#c4c4c4";
+            }).ofObject(),
+        ),
         // the content consists of a header and a list of items
         $(
             go.Panel,
@@ -180,7 +184,7 @@ function initDiagram() {
 
 
 $(document).ready(function () {
-    console.log("ready!");
+
     $('#layout-type').on('change', function (e) {
         const $ = go.GraphObject.make;
         const diagram = go.Diagram.fromDiv("myDiagramDiv");
@@ -197,4 +201,33 @@ $(document).ready(function () {
             diagram.layout = $(go.ForceDirectedLayout);
         }
     });
+
+    $('#search').on('input', function (e) {
+        let input = document.getElementById("search").value;
+        const diagram = go.Diagram.fromDiv("myDiagramDiv");
+        diagram.startTransaction("highlight search");
+
+        if (input) {
+            let regex = new RegExp(input, "i");
+            let results = diagram.findNodesByExample(
+                {name: regex}, {type: regex}, {
+                    fields: function (fields) {
+                        if (fields) {
+                            return fields.some(f => {
+                                return (regex.test(f.field) || regex.test(f.value))
+                            })
+                        }
+                    }
+                },
+            );
+            diagram.highlightCollection(results);
+            // try to center the diagram at the first node that was found
+            if (results.count > 0) diagram.centerRect(results.first().actualBounds);
+        } else {
+            diagram.clearHighlighteds();
+        }
+
+        diagram.commitTransaction("highlight search");
+    });
+
 });
